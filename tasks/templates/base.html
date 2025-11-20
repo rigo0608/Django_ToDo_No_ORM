@@ -1,0 +1,80 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>To-Do App</title>
+
+    <!-- Include Mini.css for simple clean styling -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mini.css/3.0.1/mini-default.min.css">
+
+    <style>
+        /* Page background */
+        body {
+            background: #f5f6fa;
+        }
+
+        /* Header styling */
+        header {
+            background: #2b2d42;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        /* Brand/logo style */
+        header .brand {
+            font-size: 1.45rem;
+            font-weight: bold;
+            color: #ffffff !important;
+            text-decoration: none;
+        }
+
+        /* Header buttons */
+        header a.button {
+            background: #edf2f4;
+            color: #2b2d42 !important;
+            border-radius: 5px;
+            padding: 0.45rem 1.2rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: 0.2s;
+        }
+
+        header a.button:hover {
+            background: #dbe2e5;
+        }
+
+        /* Card style for task cards */
+        .card {
+            background: #ffffff;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        /* Main container spacing */
+        main.container {
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <!-- App logo/brand -->
+    <a href="/" class="brand">📝 To-Do App</a>
+    <!-- Navigation buttons -->
+    <a href="/" class="button">Tasks</a>
+    <a href="/add/" class="button">Add Task</a>
+</header>
+
+<main class="container">
+    <!-- Content block for each page -->
+    {% block content %}{% endblock %}
+</main>
+
+</body>
+</html>

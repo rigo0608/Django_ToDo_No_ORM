@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!-- Page title -->
+<h2 id="form-title" style="margin-bottom: 1rem;">Add Task</h2>
+
+<!-- Task form card -->
+<div class="card" style="max-width:700px; margin:auto; padding:2rem;">
+    <form id="task-form">
+
+        <!-- Title and Description fields -->
+        <div class="row responsive">
+            <div class="col-sm-6">
+                <label>Title</label>
+                <input type="text" id="title" placeholder="Enter task title" required>
+            </div>
+
+            <div class="col-sm-6">
+                <label>Description</label>
+                <textarea id="description" placeholder="Write a short description..." rows="2"></textarea>
+            </div>
+        </div>
+
+        <!-- Status and Due Date fields -->
+        <div class="row responsive" style="margin-top:1rem;">
+            <div class="col-sm-4">
+                <label>Status</label>
+                <select id="status">
+                    <option value="pending">Pending</option>
+                    <option value="completed">Completed</option>
+                </select>
+            </div>
+
+            <div class="col-sm-4">
+                <label>Due Date</label>
+                <input type="date" id="due_date">
+            </div>
+        </div>
+
+        <!-- Submit button -->
+        <button type="submit" class="primary" style="margin-top:1.5rem; width:100%; padding:0.8rem;">
+            Save Task
+        </button>
+
+        <!-- Error message display -->
+        <div id="msg" style="margin-top:1rem; color:red; font-weight:500;"></div>
+    </form>
+</div>
+
+<!-- Safe JSON script to pass task_id -->
+{{ task_id|json_script:"taskId" }}
+
+<script>
+// ----------------------
+// DOM Elements
+// ----------------------
+const title = document.getElementById('title');
+const description = document.getElementById('description');
+const status = document.getElementById('status');
+const due_date = document.getElementById('due_date');
+const msg = document.getElementById('msg');
+
+// Read taskId safely from template
+const taskId = JSON.parse(document.getElementById("taskId").textContent);
+
+// ----------------------
+// Load task if editing
+// ----------------------
+async function loadTask() {
+    if (!taskId) return;
+
+    try {
+        const res = await fetch(`/api/tasks/${taskId}/`);
+        if (!res.ok) throw new Error("Failed to load task");
+
+        const t = await res.json();
+
+        title.value = t.title || '';
+        description.value = t.description || '';
+        due_date.value = t.due_date || '';
+        status.value = (t.status || 'pending').toLowerCase();
+
+        document.getElementById('form-title').innerText = "Edit Task";
+    } catch (err) {
+        console.error(err);
+        msg.innerText = "Failed to load task data";
+    }
+}
+
+// ----------------------
+// Submit form handler
+// ----------------------
+document.getElementById('task-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    msg.innerText = '';
+
+    // Prepare payload to send to API
+    const payload = {
+        title: title.value.trim(),
+        description: description.value.trim(),
+        due_date: due_date.value || null,
+        status: status.value.toLowerCase()
+    };
+
+    console.log("DEBUG payload:", payload);
+
+    let url = taskId ? `/api/tasks/update/${taskId}/` : '/api/tasks/create/';
+    let method = taskId ? 'PUT' : 'POST';
+
+    try {
+        const res = await fetch(url, {
+            method,
+            headers: {"Content-Type":"application/json"},
+            body: JSON.stringify(payload)
+        });
+
+        console.log("DEBUG response:", res);
+
+        if (res.ok) {
+            // Redirect back to tasks list
+            window.location.href = '/';
+        } else {
+            const err = await res.json();
+            msg.innerText = err.error || "Error saving task";
+        }
+    } catch (err) {
+        console.error(err);
+        msg.innerText = "Network or server error";
+    }
+});
+
+// Load task data on page load
+loadTask();
+</script>
+
+{% endblock %}
